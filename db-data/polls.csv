@@ -1,0 +1,6 @@
+id,question,text
+1,"What's your favorite color?","{""1"": ""Red"", ""2"": ""Blue"", ""3"": ""Green"", ""4"": ""Yellow""}"
+2,"What's your favorite programming language?","{""1"": ""Python"", ""2"": ""JavaScript"", ""3"": ""C++"", ""4"": ""Go""}"
+3,"Which season do you like the most?","{""1"": ""Spring"", ""2"": ""Summer"", ""3"": ""Autumn"", ""4"": ""Winter""}"
+4,"What's your preferred mode of transport?","{""1"": ""Car"", ""2"": ""Bike"", ""3"": ""Bus"", ""4"": ""Train""}"
+5,"What's your favorite food?","{""1"": ""Pizza"", ""2"": ""Burger"", ""3"": ""Sushi"", ""4"": ""Salad""}"

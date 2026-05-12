@@ -1,0 +1,71 @@
+name: Redis-In-Action
+
+services:
+  postgres:
+    image: postgres:17.4-alpine3.21
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db-data:/data
+
+  redis:
+    image: redis:7.4.3-alpine
+    container_name: redis_server
+    restart: always
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redisinsight:
+    image: redis/redisinsight:2.68
+    container_name: redis_insight
+    depends_on:
+      - redis
+    ports:
+      - "5540:5540"
+    restart: always
+
+  django:
+    build: .
+    container_name: django_app
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./app:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    command: >
+          sh -c "
+          if python manage.py shell -c 'from django.contrib.auth.models import User; print(User.objects.filter(username=\"admin\").exists())' | grep -q 'True'; then
+            echo 'Admin user exists, skipping app and database setup';
+          else
+            rm -f polls/migrations/0001_initial.py &&
+            python manage.py migrate --noinput &&
+            python manage.py makemigrations &&
+            python manage.py migrate polls --fake &&
+            python manage.py shell -c 'from django.contrib.auth.models import User; User.objects.create_superuser(\"admin\", \"admin@example.com\", \"admin\");' ;
+          fi &&
+          uvicorn core.asgi:application --host 0.0.0.0 --port 8000 --reload
+          "
