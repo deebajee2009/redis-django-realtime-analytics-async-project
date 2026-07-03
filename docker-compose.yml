@@ -1,4 +1,4 @@
-name: Redis-In-Action
+name: Redis-In-Action-Realtime-Analytics
 
 services:
   postgres:

@@ -5,7 +5,7 @@ import json
 
 from django.conf import settings
 
-from redis_poll_reporting import delete_cached_poll_results
+from .redis_poll_reporting import delete_cached_poll_results
 
 
 r = settings.REDIS_CLIENT
